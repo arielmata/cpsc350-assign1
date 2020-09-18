@@ -1,1 +1,16 @@
-# cpsc350-fall2020-assignment1
+# CPSC350 Assignment 1
+
+**Author:** Ariel Gutierrez
+
+## Identifying Information
+
+## Source Files
+
+## ?
+
+## Specification
+
+1. F
+
+## 
+
