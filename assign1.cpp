@@ -10,9 +10,6 @@ list of DNA strings.
 */
 
 #include "assign1.h"
-#include <math.h> // pow, sqrt, M_PI, log
-#include <stdlib.h> //rand, RAND_MAX
-
 
 // Default Constructor
 DnaProcessor::DnaProcessor(){
@@ -26,7 +23,7 @@ DnaProcessor::DnaProcessor(){
   probG = 0.0;
 }
 
-// Deconstructor
+// Destructor
 DnaProcessor::~DnaProcessor(){
   cout << "Farewell!" << endl;
 }
@@ -40,7 +37,8 @@ void DnaProcessor::statistics(string fileName, ofstream& ofs){
 
   ifstream infile;
   infile.open(fileName);
-  while(getline(infile, line)){ //get line??
+  while(getline(infile, line)){
+    line.erase(line.length()-1); // delete new line character
     sum += line.length();
     ++count;
   }
@@ -49,16 +47,17 @@ void DnaProcessor::statistics(string fileName, ofstream& ofs){
 
   infile.open(fileName);
   while(getline(infile, line)){
+    line.erase(line.length()-1);
     numerator += pow((line.length() - mean),2);
   }
   infile.close();
   var = numerator/(sum-1);
   standardDev = sqrt(var);
 
-  ofs << "The Sum of the length of the DNA strings::" << sum;
-  ofs << "The Mean of the length of the DNA strings:" << mean;
-  ofs << "The variance of the length of the DNA strings:" << var;
-  ofs << "The Standard Deviation of the length of the DNA stings:" <<standardDev;
+  ofs << "The Sum of the length of the DNA strings: " << sum << endl;
+  ofs << "The Mean of the length of the DNA strings: " << mean << endl;
+  ofs << "The Variance of the length of the DNA strings: " << var << endl;
+  ofs << "The Standard Deviation of the length of the DNA stings: " <<standardDev << endl;
   ofs << "\n";
   ofs << "\n";
 }
@@ -67,13 +66,13 @@ void DnaProcessor::statistics(string fileName, ofstream& ofs){
 // outputs them to given file.
 void DnaProcessor::nucleotideProbability(string fileName, ofstream& ofs){
   string line;
-  int countA = 0, countC = 0, countT = 0, countG = 0, nuCount = 0;
+  int countA = 0, countC = 0, countT = 0, countG = 0;
 
   ifstream infile;
   infile.open(fileName);
   while(getline(infile, line)){
+    line.erase(line.length()-1);
     for (int i = 0; i < line.length(); ++i){
-      ++nuCount;
       if(tolower(line[i]) == 'a'){
         ++countA;
       } else if(tolower(line[i]) == 'c'){
@@ -87,10 +86,10 @@ void DnaProcessor::nucleotideProbability(string fileName, ofstream& ofs){
   }
   infile.close();
 
-  probA = countA/nuCount;
-  probG = countG/nuCount;
-  probT = countT/nuCount;
-  probC = countC/nuCount;
+  probA = (double)countA/sum;
+  probC = (double)countC/sum;
+  probT = (double)countT/sum;
+  probG = (double)countG/sum;
 
   ofs << "Here is the relative probability of each nucleotide:\n";
   ofs << "\n";
@@ -98,7 +97,6 @@ void DnaProcessor::nucleotideProbability(string fileName, ofstream& ofs){
   ofs << "G:     " << probG << "\n";
   ofs << "T:     " << probT << "\n";
   ofs << "C:     " << probC << "\n";
-  ofs << "\n";
   ofs << "\n";
 }
 
@@ -110,22 +108,24 @@ void DnaProcessor::bigramProbability(string fileName, ofstream& ofs){
   int countAC = 0, countCC = 0, countTC = 0, countGC = 0;
   int countAT = 0, countCT = 0, countTT = 0, countGT = 0;
   int countAG = 0, countCG = 0, countTG = 0, countGG = 0;
-  int bigramCount;
+  int bigramCount = 0;;
   string line, compare;
 
   ifstream infile;
   infile.open(fileName);
   while(getline(infile, line)){
+    line.erase(line.length()-1);
     if(line.length()%2 == 1){
-      // odd - add first nucleotide to end of string
+      // if odd, add first nucleotide to end of string
       line += line[0];
     }
+    bigramCount += line.length()/2;
+    std::transform (line.begin(), line.end(), line.begin(), ::tolower);
     for(int i = 0; i < line.length()/2; ++i){
-      ++bigramCount;
-      compare = tolower(line[2*i]) + "" + tolower(line[2*i+1]);
+      compare = line.substr(i*2,2);
       if(compare == "aa"){
         ++countAA;
-      } else if(compare == "ca"){ //forbids comparison between pointer and integer
+      } else if(compare == "ca"){
         ++countCA;
       } else if(compare == "ta"){
         ++countTA;
@@ -161,24 +161,24 @@ void DnaProcessor::bigramProbability(string fileName, ofstream& ofs){
   infile.close();
 
   ofs << "Here is the relative probability of each nucleotide bigram:\n";
-  ofs << "AA:     " << (double)countAA/bigramCount <<"\n";
-  ofs << "AC:     " << (double)countAC/bigramCount <<"\n";
-  ofs << "AT:     " << (double)countAT/bigramCount <<"\n";
-  ofs << "AG:     " << (double)countAG/bigramCount <<"\n";
-  ofs << "CA:     " << (double)countCA/bigramCount <<"\n";
-  ofs << "CC:     " << (double)countCC/bigramCount <<"\n";
-  ofs << "CT:     " << (double)countCT/bigramCount <<"\n";
-  ofs << "CG:     " << (double)countCG/bigramCount <<"\n";
-  ofs << "TA:     " << (double)countTA/bigramCount <<"\n";
-  ofs << "TC:     " << (double)countTC/bigramCount <<"\n";
-  ofs << "TT:     " << (double)countTT/bigramCount <<"\n";
-  ofs << "TG:     " << (double)countTG/bigramCount <<"\n";
-  ofs << "GA:     " << (double)countGA/bigramCount <<"\n";
-  ofs << "GC:     " << (double)countGC/bigramCount <<"\n";
-  ofs << "GT:     " << (double)countGT/bigramCount <<"\n";
-  ofs << "GG:     " << (double)countGG/bigramCount <<"\n";
-  ofs << "\n";
-  ofs << "\n";
+  ofs << "AA:     " << (double)countAA/bigramCount << endl;
+  ofs << "AC:     " << (double)countAC/bigramCount << endl;
+  ofs << "AT:     " << (double)countAT/bigramCount << endl;
+  ofs << "AG:     " << (double)countAG/bigramCount << endl;
+  ofs << "CA:     " << (double)countCA/bigramCount << endl;
+  ofs << "CC:     " << (double)countCC/bigramCount << endl;
+  ofs << "CT:     " << (double)countCT/bigramCount << endl;
+  ofs << "CG:     " << (double)countCG/bigramCount << endl;
+  ofs << "TA:     " << (double)countTA/bigramCount << endl;
+  ofs << "TC:     " << (double)countTC/bigramCount << endl;
+  ofs << "TT:     " << (double)countTT/bigramCount << endl;
+  ofs << "TG:     " << (double)countTG/bigramCount << endl;
+  ofs << "GA:     " << (double)countGA/bigramCount << endl;
+  ofs << "GC:     " << (double)countGC/bigramCount << endl;
+  ofs << "GT:     " << (double)countGT/bigramCount << endl;
+  ofs << "GG:     " << (double)countGG/bigramCount << endl;
+  ofs <<  endl;
+  ofs <<  endl;
 }
 
 // Generate 1000 DNA strings whose lengths follow a Gaussian distribution, and
@@ -186,6 +186,12 @@ void DnaProcessor::bigramProbability(string fileName, ofstream& ofs){
 void DnaProcessor::gaussianDistribution(ofstream& ofs){
   double a, b, C, D, num;
   string nucleoStr;
+  double minProb = probA;
+
+  //need to find the smallest prob
+  //if (probC < probA){
+  //  minProb = probC;
+  //} else if (prob C)
 
   for(int i = 0; i < 1000; ++i){
     a = (double)rand()/RAND_MAX;
@@ -195,22 +201,16 @@ void DnaProcessor::gaussianDistribution(ofstream& ofs){
     nucleoStr = "";
 
     for(int j = 0; j < D; ++j){
-      num = double(rand())/100; // make a percentage
-      while (true){
-        if(num == probA){
+      num = (double)rand()/RAND_MAX; // make a percentage
+        if(num <= probA){
           nucleoStr += "A";
-          break;
-        } else if(num == probT){
+        } else if(num <= probT + probA){
           nucleoStr += "C";
-          break;
-        } else if(num == probC){
+        } else if(num <= probC + probT + probA){
           nucleoStr += "T";
-          break;
-        } else if(num == probG){
+        } else{
           nucleoStr += "G";
-          break;
         }
-      }
     }
     // append string to file
     ofs << nucleoStr << "\n";

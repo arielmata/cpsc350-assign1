@@ -8,9 +8,12 @@ Assignment or exercise number: Assignment 1
 Assignment 1: A simple analysis program that will compute basics stastics for a
 list of DNA strings.
 */
+
 #include <iostream> // input and output
 #include <fstream> // read and open files
-
+#include <math.h> // pow, sqrt, M_PI, log
+#include <stdlib.h> //rand, RAND_MAX
+#include <algorithm> //transform
 using namespace std;
 
 class DnaProcessor{
