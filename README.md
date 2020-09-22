@@ -6,7 +6,7 @@ Full name: Ariel Gutierrez
 
 Student ID: 2318163
 
-Chapman email: arigutierrez@chapman.edu
+Chapman Email: arigutierrez@chapman.edu
 
 Course number and section: CPSC350-01
 
